@@ -33,7 +33,6 @@ permissions:
 
 jobs:
   sync-files:
-    environment: bot-identity
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner

@@ -166,7 +166,6 @@ jobs:
             }
 
   deploy-pr:
-    environment: pr-preview
     needs: check-comment
     runs-on: ubuntu-latest
     permissions:

@@ -101,7 +101,6 @@ jobs:
           echo "allow_fork=${allow_fork:-false}" >> $GITHUB_OUTPUT
 
   deploy-v2-pr:
-    environment: pr-preview
     needs: check-pr
     runs-on: ubuntu-latest
     if: needs.check-pr.outputs.should_deploy == 'true' && (needs.check-pr.outputs.is_fork == 'false' || needs.check-pr.outputs.allow_fork == 'true')

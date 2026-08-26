@@ -196,7 +196,6 @@ jobs:
           retention-days: 1
 
   build:
-    environment: release-signing
     needs: determine-matrix
     strategy:
       fail-fast: false
