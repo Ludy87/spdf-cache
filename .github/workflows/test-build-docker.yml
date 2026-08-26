@@ -300,7 +300,7 @@ jobs:
           set -eu
           docker run -d --name unoserver-smoke \
             -e UNOSERVER_RECYCLE_INTERVAL_SECONDS=0 \
-            stirling-unoserver:pr-test
+            "${{ steps.image.outputs.name }}:stirling-unoserver-pr-test-${{ github.sha }}"
           deadline=$((SECONDS + 60))
           while [ $SECONDS -lt $deadline ]; do
             status=$(docker inspect -f '{{.State.Health.Status}}' unoserver-smoke 2>/dev/null || echo "starting")
