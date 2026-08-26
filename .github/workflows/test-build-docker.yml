@@ -58,9 +58,9 @@ jobs:
   test-build-docker-images:
     if: always() && (needs.prepare-base-image.result == 'success' || needs.prepare-base-image.result == 'skipped') && false
     needs: [prepare-base-image]
-    environment:
-      name: ci-unsigned
-      deployment: false
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
