@@ -1,8 +1,8 @@
 name: Auto PR V2 Deployment
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
+  # pull_request:
+  #   types: [opened, synchronize, reopened, closed]
   workflow_dispatch:
     inputs:
       pr:
