@@ -285,11 +285,9 @@ jobs:
         if: env.RUN_UNOSERVER == 'true'
         run: |
           set -eu
-          hash=$(cat \
-            docker/unoserver/Dockerfile \
-            docker/unoserver/entrypoint.sh \
-            docker/unoserver/healthcheck.sh \
-            docker/unoserver/VERSION \
+          hash=$(find docker/unoserver -type f -print0 \
+            | sort -z \
+            | xargs -0 sha256sum \
             | sha256sum | cut -d' ' -f1)
           echo "hash=${hash}" >> "$GITHUB_OUTPUT"
           echo "Unoserver source hash: ${hash}"
