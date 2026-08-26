@@ -35,7 +35,6 @@ jobs:
           download-from-astral-mirror: false
 
   unoserver-image-cache-prime:
-    if: false
     environment:
       name: ci-unsigned
       deployment: false
@@ -115,7 +114,6 @@ jobs:
             ) }}
 
   gradle-cache-prime:
-    if: false
     environment:
       name: ci-unsigned
       deployment: false
