@@ -183,7 +183,7 @@ jobs:
       ]
     permissions:
       contents: read
-      packages: read
+      packages: write
     uses: ./.github/workflows/test-build-docker.yml
     secrets: inherit
     with:
