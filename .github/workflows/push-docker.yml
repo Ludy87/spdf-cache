@@ -53,6 +53,7 @@ jobs:
     if: ${{ vars.CI_PROFILE != 'lite' }}
     runs-on: ubuntu-24.04-8core
     permissions:
+      contents: read
       packages: write
       id-token: write
     # On push events these stay 'true'; on workflow_dispatch they follow the inputs.
