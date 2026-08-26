@@ -261,7 +261,7 @@ jobs:
         id: repoowner
         run: echo "lowercase=$(echo ${{ github.repository_owner }} | awk '{print tolower($0)}')" >> $GITHUB_OUTPUT
 
-      - name: Image-Namen festlegen
+      - name: Image-Namen festlegen 1
         id: image
         shell: bash
         run: echo "name=ghcr.io/${{ steps.repoowner.outputs.lowercase }}/s-pdf" >> "$GITHUB_OUTPUT"
