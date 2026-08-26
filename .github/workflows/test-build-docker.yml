@@ -127,7 +127,7 @@ jobs:
           distribution: "temurin"
 
       - name: Install Task
-        uses: go-task/setup-task@01a4adf9db2d14c1de7a560f09170b6e0df736aa # v2.1.0
+        uses: ./.github/actions/setup-task
       - name: Build application
         run: task backend:build
         env:
@@ -255,12 +255,12 @@ jobs:
         with:
           path: ${{ runner.temp }}/.buildx-cache
           key: test-build-unoserver-image-${{ runner.os }}-${{ hashFiles(
-                'docker/unoserver/Dockerfile',
-                'docker/unoserver/fonts.conf',
-                'docker/unoserver/entrypoint.sh',
-                'docker/unoserver/healthcheck.sh',
-                '.dockerignore'
-              ) }}
+            'docker/unoserver/Dockerfile',
+            'docker/unoserver/fonts.conf',
+            'docker/unoserver/entrypoint.sh',
+            'docker/unoserver/healthcheck.sh',
+            '.dockerignore'
+            ) }}
 
       - name: Build docker/unoserver/Dockerfile
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
