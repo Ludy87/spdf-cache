@@ -67,7 +67,7 @@ jobs:
     secrets: inherit
 
   build:
-    if: needs.files-changed.outputs.backend == 'true' && false
+    if: needs.files-changed.outputs.backend == 'true'
     needs: [files-changed, gradle-cache-prime]
     permissions:
       actions: read
