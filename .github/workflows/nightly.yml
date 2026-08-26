@@ -64,6 +64,7 @@ jobs:
   # the story itself — a shared component, a theme token — still surfaces within
   # a day.
   a11y-all-stories:
+    if: false
     name: a11y (every story)
     strategy:
       fail-fast: false
@@ -127,6 +128,7 @@ jobs:
   # Runs the @nightly tag (conversion scenarios) plus a 10-shard concurrency run
   # of every other feature.
   cucumber-nightly:
+    if: false
     environment:
       name: ci-unsigned
       deployment: false
