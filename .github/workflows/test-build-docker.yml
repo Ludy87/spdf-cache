@@ -250,6 +250,11 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
+      - name: Image-Namen festlegen
+        id: image
+        shell: bash
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
       - name: Build docker/unoserver/Dockerfile
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
@@ -265,8 +270,9 @@ jobs:
           #   type=gha,mode=max,scope=stirling-unoserver
           # type=local,dest=${{ runner.temp }}/.buildx-cache-new,mode=max
           platforms: linux/amd64
-          tags: stirling-unoserver:pr-test
-            ghcr.io/${{ github.repository }}:stirling-unoserver:pr-test-${{ github.sha }}
+          tags:
+            # ${{ steps.image.outputs.name }}:stirling-unoserver-pr-test
+            ${{ steps.image.outputs.name }}:stirling-unoserver-pr-test-${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: false
