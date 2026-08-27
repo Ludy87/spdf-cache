@@ -68,6 +68,14 @@ jobs:
         # if: steps.cache-uv-restore.outputs.cache-hit != 'true'
         run: uv sync --project engine --locked --group tools
 
+      - name: commit uv lock file
+        # if: steps.cache-uv-restore.outputs.cache-hit != 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add engine/uv.lock
+          git commit -m "Update uv.lock file" || echo "No changes to commit"
+
       - name: Save uv cache
         if: >-
           success() &&
