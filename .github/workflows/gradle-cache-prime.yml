@@ -28,6 +28,17 @@ jobs:
       - name: Checkout repository 1
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Check cache token availability
+        env:
+          CACHE_APP_TOKEN: ${{ secrets.CACHE_APP_TOKEN }}
+        run: |
+          if [ -n "$CACHE_APP_TOKEN" ]; then
+            echo "CACHE_APP_TOKEN is available"
+          else
+            echo "CACHE_APP_TOKEN is missing"
+            exit 1
+          fi
+
       - name: Restore uv cache
         id: cache
         uses: Ludy87/cache-the-planet@main
@@ -47,7 +58,7 @@ jobs:
                   runner.os,
                   runner.arch,
                   hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
-          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Report uv cache result
         run: |
@@ -88,7 +99,7 @@ jobs:
                   runner.os,
                   runner.arch,
                   hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
-          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          token: ${{ secrets.CACHE_APP_TOKEN }}
           allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
           exclude: |
             **/.env
@@ -140,7 +151,7 @@ jobs:
                     'docker/unoserver/entrypoint.sh',
                     'docker/unoserver/healthcheck.sh',
                     '.dockerignore')) }}
-          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Report Buildx cache result
         run: |
@@ -214,7 +225,7 @@ jobs:
                     'docker/unoserver/entrypoint.sh',
                     'docker/unoserver/healthcheck.sh',
                     '.dockerignore')) }}
-          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          token: ${{ secrets.CACHE_APP_TOKEN }}
           allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
           exclude: |
             **/.env
@@ -271,7 +282,7 @@ jobs:
                     'build.gradle',
                     'app/**/build.gradle',
                     'gradle/**/*.gradle')) }}
-          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Report Gradle cache result
         run: |
@@ -332,7 +343,7 @@ jobs:
                     'build.gradle',
                     'app/**/build.gradle',
                     'gradle/**/*.gradle')) }}
-          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          token: ${{ secrets.CACHE_APP_TOKEN }}
           allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
           exclude: |
             **/.env
