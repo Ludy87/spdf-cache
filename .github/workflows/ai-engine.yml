@@ -59,7 +59,7 @@ jobs:
 
       - name: Save uv cache
         if: steps.engine-check.outcome == 'success'
-        uses: Ludy87/cache-the-planet/save@main
+        uses: Ludy87/cache-the-planet/save@b9a66d2090fe434f7fb5669fd9ec1a2e7e5f0b50
         with:
           repository: Ludy87/cache-the-planet
           path: |
