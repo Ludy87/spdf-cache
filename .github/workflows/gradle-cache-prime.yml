@@ -17,6 +17,8 @@ jobs:
     name: Prime node cache
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      NPM_CONFIG_CACHE: ${{ github.workspace }}/.cache/npm
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
@@ -35,24 +37,36 @@ jobs:
           path: .cache/npm
           key: >-
             ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/npm/{2}-{3}/{4}/v1',
+              && format('untrusted/{0}/pr-{1}/npm/{2}-{3}/{4}/v1',
                   github.repository,
                   github.event.pull_request.number,
                   runner.os,
                   runner.arch,
-                  hashFiles('package-lock.json'))
-                || format('trusted/{0}/npm/{1}-{2}/{3}/v1',
+                  hashFiles('frontend/package-lock.json'))
+              || format('trusted/{0}/npm/{1}-{2}/{3}/v1',
                   github.repository,
                   runner.os,
                   runner.arch,
-                  hashFiles('package-lock.json')) }}
+                  hashFiles('frontend/package-lock.json'))
+            }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
+
+      - name: Report node cache result
+        run: |
+          echo "Exact hit: ${{ steps.cache-node-restore.outputs.cache-hit }}"
+          echo "Matched key: ${{ steps.cache-node-restore.outputs.matched-key }}"
+          echo "Object: ${{ steps.cache-node-restore.outputs.content-hash }}"
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "22"
           package-manager-cache: false
+
+      - name: Prepare npm cache directory
+        run: |
+          echo "npm cache: $(npm config get cache)"
+          mkdir -p "$NPM_CONFIG_CACHE"
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -71,17 +85,18 @@ jobs:
           path: .cache/npm
           key: >-
             ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/npm/{2}-{3}/{4}/v1',
+              && format('untrusted/{0}/pr-{1}/npm/{2}-{3}/{4}/v1',
                   github.repository,
                   github.event.pull_request.number,
                   runner.os,
                   runner.arch,
-                  hashFiles('package-lock.json'))
-                || format('trusted/{0}/npm/{1}-{2}/{3}/v1',
+                  hashFiles('frontend/package-lock.json'))
+              || format('trusted/{0}/npm/{1}-{2}/{3}/v1',
                   github.repository,
                   runner.os,
                   runner.arch,
-                  hashFiles('package-lock.json')) }}
+                  hashFiles('frontend/package-lock.json'))
+            }}
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
           exclude: |
@@ -176,7 +191,6 @@ jobs:
                   runner.arch,
                   hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
-          allow-pr-cache: true
           exclude: |
             **/.env
             **/*.pem
@@ -305,7 +319,6 @@ jobs:
                     'docker/unoserver/healthcheck.sh',
                     '.dockerignore')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
-          allow-pr-cache: true
           exclude: |
             **/.env
             **/*.pem
