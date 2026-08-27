@@ -9,6 +9,8 @@ name: Build and Test Workflow
 # job either succeeded or was legitimately skipped by its path filter.
 
 on:
+  push:
+    branches: ["main"]
   pull_request:
     branches: ["main"]
   merge_group:
