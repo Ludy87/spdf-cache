@@ -38,7 +38,6 @@ jobs:
           path: |
             .cache/uv
             .cache/uv-python
-            engine/.venv
           key: >-
             ${{ github.event_name == 'pull_request'
                 && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/{4}/v1',
@@ -84,7 +83,6 @@ jobs:
           path: |
             .cache/uv
             .cache/uv-python
-            engine/.venv
           key: >-
             ${{ github.event_name == 'pull_request'
                 && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/{4}/v1',
