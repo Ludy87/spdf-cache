@@ -80,6 +80,10 @@ jobs:
                   runner.arch,
                   hashFiles('package-lock.json')) }}
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
+          exclude: |
+            **/.env
+            **/*.pem
+            **/*credentials*
           allow-pr-cache: true
 
   uv-cache-prime:
