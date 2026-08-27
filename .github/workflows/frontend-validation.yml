@@ -13,6 +13,8 @@ permissions:
 jobs:
   frontend-validation:
     runs-on: ubuntu-latest
+    env:
+      npm_config_cache: ${{ github.workspace }}/.cache/npm
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
@@ -25,7 +27,7 @@ jobs:
         uses: Ludy87/cache-the-planet@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
         with:
           repository: Ludy87/cache-the-planet
-          path: ~/.npm
+          path: .cache/npm
           key: npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-
@@ -141,7 +143,7 @@ jobs:
         uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
         with:
           repository: Ludy87/cache-the-planet
-          path: ~/.npm
+          path: .cache/npm
           key: npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-${{ hashFiles('package-lock.json') }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
 

@@ -15,6 +15,8 @@ permissions:
 jobs:
   engine:
     runs-on: ubuntu-latest
+    env:
+      UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
     permissions:
       contents: read
       pull-requests: write
@@ -33,7 +35,7 @@ jobs:
         with:
           repository: Ludy87/cache-the-planet
           path: |
-            ~/.cache/uv
+            .cache/uv
             engine/.venv
           key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
           restore-keys: |
@@ -61,7 +63,7 @@ jobs:
         with:
           repository: Ludy87/cache-the-planet
           path: |
-            ~/.cache/uv
+            .cache/uv
             engine/.venv
           key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
