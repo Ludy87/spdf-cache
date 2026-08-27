@@ -13,6 +13,8 @@ permissions:
 jobs:
   frontend-validation:
     runs-on: ubuntu-latest
+    env:
+      npm_config_cache: ${{ github.workspace }}/.cache/npm
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
@@ -20,6 +22,16 @@ jobs:
           egress-policy: audit
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Restore npm cache
+        id: npm-cache
+        uses: Ludy87/cache-the-planet@main
+        with:
+          repository: Ludy87/cache-the-planet
+          path: .cache/npm
+          key: npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-
+          token: ${{ secrets.CACHE_APP_TOKEN }}
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -123,8 +135,18 @@ jobs:
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: "0.12.6"
-          enable-cache: true
+          enable-cache: false
           download-from-astral-mirror: false
+
+      - name: Save npm cache
+        if: steps.frontend-check.outcome == 'success'
+        uses: Ludy87/cache-the-planet/save@b9a66d2090fe434f7fb5669fd9ec1a2e7e5f0b50
+        with:
+          repository: Ludy87/cache-the-planet
+          path: .cache/npm
+          key: npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-${{ hashFiles('package-lock.json') }}
+          token: ${{ secrets.CACHE_APP_TOKEN }}
+          allow-pr-cache: true
 
       - name: Vitest coverage step summary
         if: always()

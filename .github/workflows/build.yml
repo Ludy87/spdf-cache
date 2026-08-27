@@ -28,13 +28,15 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   files-changed:
     name: detect what files changed
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    permissions:
+      contents: read
     outputs:
       build: ${{ steps.changes.outputs.build }}
       backend: ${{ steps.changes.outputs.backend }}
@@ -63,6 +65,8 @@ jobs:
 
   gradle-cache-prime:
     needs: [files-changed]
+    permissions:
+      contents: write
     uses: ./.github/workflows/gradle-cache-prime.yml
     secrets: inherit
 
