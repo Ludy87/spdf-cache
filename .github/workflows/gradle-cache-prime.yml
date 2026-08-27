@@ -41,7 +41,7 @@ jobs:
 
       - name: Restore uv cache
         id: cache
-        uses: Ludy87/cache-the-planet@b9a66d2090fe434f7fb5669fd9ec1a2e7e5f0b50
+        uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/uv
@@ -82,7 +82,7 @@ jobs:
           success() &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
-        uses: Ludy87/cache-the-planet/save@b9a66d2090fe434f7fb5669fd9ec1a2e7e5f0b50
+        uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/uv
@@ -200,7 +200,7 @@ jobs:
           success() &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
-        uses: Ludy87/cache-the-planet/save@b9a66d2090fe434f7fb5669fd9ec1a2e7e5f0b50
+        uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/buildx/unoserver
@@ -251,7 +251,7 @@ jobs:
 
       - name: Cache Gradle (lookup-only)
         id: cache
-        uses: Ludy87/cache-the-planet@b9a66d2090fe434f7fb5669fd9ec1a2e7e5f0b50
+        uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
           path: |
@@ -312,7 +312,7 @@ jobs:
           steps.cache.outputs.cache-hit != 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
-        uses: Ludy87/cache-the-planet/save@b9a66d2090fe434f7fb5669fd9ec1a2e7e5f0b50
+        uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
           path: |
