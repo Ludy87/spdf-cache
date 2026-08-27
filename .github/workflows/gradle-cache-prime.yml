@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   uv-cache-prime:
@@ -34,9 +34,20 @@ jobs:
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/uv
-          key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
+          key: >-
+            ${{ github.event_name == 'pull_request'
+                && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/{4}/v1',
+                  github.repository,
+                  github.event.pull_request.number,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('engine/pyproject.toml', 'engine/uv.lock'))
+                || format('trusted/{0}/uv/{1}-{2}/{3}/v1',
+                  github.repository,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
-          allow-pr-cache: true
 
       - name: Report uv cache result
         run: |
@@ -56,14 +67,30 @@ jobs:
         run: uv sync --project engine --locked --group tools
 
       - name: Save uv cache
-        if: success()
+        if: >-
+          success() &&
+          (github.event_name != 'pull_request' ||
+           github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/uv
-          key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
+          key: >-
+            ${{ github.event_name == 'pull_request'
+                && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/{4}/v1',
+                  github.repository,
+                  github.event.pull_request.number,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('engine/pyproject.toml', 'engine/uv.lock'))
+                || format('trusted/{0}/uv/{1}-{2}/{3}/v1',
+                  github.repository,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
-          allow-pr-cache: true
+          # allow-pr-cache: true
+          allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
 
   unoserver-image-cache-prime:
     environment:
@@ -89,9 +116,28 @@ jobs:
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/buildx/unoserver
-          key: buildx-v1-${{ runner.os }}-${{ runner.arch }}-unoserver-${{ hashFiles('docker/unoserver/Dockerfile', 'docker/unoserver/fonts.conf', 'docker/unoserver/entrypoint.sh', 'docker/unoserver/healthcheck.sh', '.dockerignore') }}
+          key: >-
+            ${{ github.event_name == 'pull_request'
+                && format('untrusted/{0}/pr-{1}/buildx/{2}-{3}/unoserver-{4}/v1',
+                  github.repository,
+                  github.event.pull_request.number,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('docker/unoserver/Dockerfile',
+                    'docker/unoserver/fonts.conf',
+                    'docker/unoserver/entrypoint.sh',
+                    'docker/unoserver/healthcheck.sh',
+                    '.dockerignore'))
+                || format('trusted/{0}/buildx/{1}-{2}/unoserver-{3}/v1',
+                  github.repository,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('docker/unoserver/Dockerfile',
+                    'docker/unoserver/fonts.conf',
+                    'docker/unoserver/entrypoint.sh',
+                    'docker/unoserver/healthcheck.sh',
+                    '.dockerignore')) }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
-          allow-pr-cache: true
 
       - name: Report Buildx cache result
         run: |
@@ -136,14 +182,37 @@ jobs:
           mv .cache/buildx/unoserver-new .cache/buildx/unoserver
 
       - name: Save Buildx cache
-        if: success()
+        if: >-
+          success() &&
+          (github.event_name != 'pull_request' ||
+           github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/buildx/unoserver
-          key: buildx-v1-${{ runner.os }}-${{ runner.arch }}-unoserver-${{ hashFiles('docker/unoserver/Dockerfile', 'docker/unoserver/fonts.conf', 'docker/unoserver/entrypoint.sh', 'docker/unoserver/healthcheck.sh', '.dockerignore') }}
+          key: >-
+            ${{ github.event_name == 'pull_request'
+                && format('untrusted/{0}/pr-{1}/buildx/{2}-{3}/unoserver-{4}/v1',
+                  github.repository,
+                  github.event.pull_request.number,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('docker/unoserver/Dockerfile',
+                    'docker/unoserver/fonts.conf',
+                    'docker/unoserver/entrypoint.sh',
+                    'docker/unoserver/healthcheck.sh',
+                    '.dockerignore'))
+                || format('trusted/{0}/buildx/{1}-{2}/unoserver-{3}/v1',
+                  github.repository,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('docker/unoserver/Dockerfile',
+                    'docker/unoserver/fonts.conf',
+                    'docker/unoserver/entrypoint.sh',
+                    'docker/unoserver/healthcheck.sh',
+                    '.dockerignore')) }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
-          allow-pr-cache: true
+          allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
 
   gradle-cache-prime:
     environment:
@@ -162,12 +231,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Calculate Gradle cache key
-        id: gradle-cache-key
-        shell: bash
-        run: |
-          echo "key=gradle-v1-${{ runner.os }}-${{ runner.arch }}-jdk-25-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml', 'buildSrc/**', 'settings.gradle', 'build.gradle', 'app/**/build.gradle', 'gradle/**/*.gradle') }}" >> "$GITHUB_OUTPUT"
-
       - name: Cache Gradle (lookup-only)
         id: cache
         uses: Ludy87/cache-the-planet@main
@@ -176,7 +239,31 @@ jobs:
           path: |
             .cache/gradle/caches
             .cache/gradle/wrapper
-          key: ${{ steps.gradle-cache-key.outputs.key }}
+          key: >-
+            ${{ github.event_name == 'pull_request'
+                && format('untrusted/{0}/pr-{1}/gradle/{2}-{3}/{4}/v1',
+                  github.repository,
+                  github.event.pull_request.number,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
+                    'gradle/libs.versions.toml',
+                    'buildSrc/**',
+                    'settings.gradle',
+                    'build.gradle',
+                    'app/**/build.gradle',
+                    'gradle/**/*.gradle'))
+                || format('trusted/{0}/gradle/{1}-{2}/{3}/v1',
+                  github.repository,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
+                    'gradle/libs.versions.toml',
+                    'buildSrc/**',
+                    'settings.gradle',
+                    'build.gradle',
+                    'app/**/build.gradle',
+                    'gradle/**/*.gradle')) }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
 
       - name: Report Gradle cache result
@@ -202,16 +289,44 @@ jobs:
           MAVEN_PUBLIC_URL: ${{ secrets.MAVEN_PUBLIC_URL }}
 
       - name: Save cache Gradle User Home
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: >-
+          success() &&
+          steps.cache.outputs.cache-hit != 'true' &&
+          (github.event_name != 'pull_request' ||
+           github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
           path: |
             .cache/gradle/caches
             .cache/gradle/wrapper
-          key: ${{ steps.gradle-cache-key.outputs.key }}
+          key: >-
+            ${{ github.event_name == 'pull_request'
+                && format('untrusted/{0}/pr-{1}/gradle/{2}-{3}/{4}/v1',
+                  github.repository,
+                  github.event.pull_request.number,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
+                    'gradle/libs.versions.toml',
+                    'buildSrc/**',
+                    'settings.gradle',
+                    'build.gradle',
+                    'app/**/build.gradle',
+                    'gradle/**/*.gradle'))
+                || format('trusted/{0}/gradle/{1}-{2}/{3}/v1',
+                  github.repository,
+                  runner.os,
+                  runner.arch,
+                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
+                    'gradle/libs.versions.toml',
+                    'buildSrc/**',
+                    'settings.gradle',
+                    'build.gradle',
+                    'app/**/build.gradle',
+                    'gradle/**/*.gradle')) }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
-          allow-pr-cache: true
+          allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
           exclude: |
             **/.env
             **/*.pem
