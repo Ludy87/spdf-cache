@@ -213,6 +213,11 @@ jobs:
                     '.dockerignore')) }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
           allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+          exclude: |
+            **/.env
+            **/env.py
+            **/*.pem
+            **/*credentials*
 
   gradle-cache-prime:
     environment:
