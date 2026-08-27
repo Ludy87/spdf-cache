@@ -63,6 +63,7 @@ jobs:
           path: .cache/uv
           key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          allow-pr-cache: true
 
   unoserver-image-cache-prime:
     environment:
@@ -142,6 +143,7 @@ jobs:
           path: .cache/buildx/unoserver
           key: buildx-v1-${{ runner.os }}-${{ runner.arch }}-unoserver-${{ hashFiles('docker/unoserver/Dockerfile', 'docker/unoserver/fonts.conf', 'docker/unoserver/entrypoint.sh', 'docker/unoserver/healthcheck.sh', '.dockerignore') }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          allow-pr-cache: true
 
   gradle-cache-prime:
     environment:
