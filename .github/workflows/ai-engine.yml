@@ -34,7 +34,7 @@ jobs:
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
-          encryption-key: ${{ secrets.CACHE_ENCRYPTION_KEY }}
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: |
             .cache/uv
             engine/.venv
@@ -63,7 +63,7 @@ jobs:
         uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
-          encryption-key: ${{ secrets.CACHE_ENCRYPTION_KEY }}
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: |
             .cache/uv
             engine/.venv
