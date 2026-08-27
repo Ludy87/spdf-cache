@@ -17,6 +17,8 @@ jobs:
     name: Prime uv cache
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
@@ -26,13 +28,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Restore uv cache
+        uses: Ludy87/cache-the-planet@main
+        with:
+          repository: Ludy87/cache-the-planet
+          path: .cache/uv
+          key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+
       - name: Install uv
         # if: steps.cache-uv-restore.outputs.cache-hit != 'true'
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: "0.12.6"
-          enable-cache: true
+          enable-cache: false
           download-from-astral-mirror: false
+
+      - name: Prime uv dependencies
+        run: uv sync --project engine --locked --group tools
+
+      - name: Save uv cache
+        if: success() && github.event_name != 'pull_request'
+        uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        with:
+          repository: Ludy87/cache-the-planet
+          path: .cache/uv
+          key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
 
   unoserver-image-cache-prime:
     environment:
@@ -41,6 +63,8 @@ jobs:
     name: Prime unoserver image cache
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      BUILDX_CACHE: .cache/buildx/unoserver
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
@@ -50,19 +74,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      # - name: Cache buildx (lookup-only)
-      #   id: cache-buildx-restore
-      #   uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-      #   with:
-      #     path: ${{ runner.temp }}/.buildx-cache
-      #     key: test-build-unoserver-image-${{ runner.os }}-${{ hashFiles(
-      #       'docker/unoserver/Dockerfile',
-      #       'docker/unoserver/fonts.conf',
-      #       'docker/unoserver/entrypoint.sh',
-      #       'docker/unoserver/healthcheck.sh',
-      #       '.dockerignore'
-      #       ) }}
-      #     lookup-only: true
+      - name: Restore Buildx cache
+        id: buildx-cache
+        uses: Ludy87/cache-the-planet@main
+        with:
+          repository: Ludy87/cache-the-planet
+          path: .cache/buildx/unoserver
+          key: buildx-v1-${{ runner.os }}-${{ runner.arch }}-unoserver-${{ hashFiles('docker/unoserver/Dockerfile', 'docker/unoserver/fonts.conf', 'docker/unoserver/entrypoint.sh', 'docker/unoserver/healthcheck.sh', '.dockerignore') }}
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+
+      - name: Prepare Buildx cache directory
+        run: mkdir -p .cache/buildx/unoserver
 
       - name: Set up QEMU
         # if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
@@ -83,37 +105,28 @@ jobs:
           push: false
           load: true
           cache-from: |
-            type=gha,scope=stirling-unoserver
-          # type=local,src=${{ runner.temp }}/.buildx-cache
+            type=local,src=.cache/buildx/unoserver
           cache-to: |
-            type=gha,scope=stirling-unoserver
-          # type=local,dest=${{ runner.temp }}/.buildx-cache-new,mode=max
+            type=local,dest=.cache/buildx/unoserver-new,mode=max
           platforms: linux/amd64
           tags: stirling-unoserver:pr-test
           provenance: false
           sbom: false
 
-      # - # Temp fix
-        # https://github.com/docker/build-push-action/issues/252
-        # https://github.com/moby/buildkit/issues/1896
-        # if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
-        # name: Move cache
-        # run: |
-        #   rm -rf ${{ runner.temp }}/.buildx-cache
-        #   mv ${{ runner.temp }}/.buildx-cache-new ${{ runner.temp }}/.buildx-cache
+      - name: Promote Buildx cache
+        if: success()
+        run: |
+          rm -rf .cache/buildx/unoserver
+          mv .cache/buildx/unoserver-new .cache/buildx/unoserver
 
-      # - name: Save cache buildx
-      #   if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
-      #   uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-      #   with:
-      #     path: ${{ runner.temp }}/.buildx-cache
-      #     key: test-build-unoserver-image-${{ runner.os }}-${{ hashFiles(
-      #       'docker/unoserver/Dockerfile',
-      #       'docker/unoserver/fonts.conf',
-      #       'docker/unoserver/entrypoint.sh',
-      #       'docker/unoserver/healthcheck.sh',
-      #       '.dockerignore'
-      #       ) }}
+      - name: Save Buildx cache
+        if: success() && github.event_name != 'pull_request'
+        uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        with:
+          repository: Ludy87/cache-the-planet
+          path: .cache/buildx/unoserver
+          key: buildx-v1-${{ runner.os }}-${{ runner.arch }}-unoserver-${{ hashFiles('docker/unoserver/Dockerfile', 'docker/unoserver/fonts.conf', 'docker/unoserver/entrypoint.sh', 'docker/unoserver/healthcheck.sh', '.dockerignore') }}
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
 
   gradle-cache-prime:
     environment:
@@ -122,6 +135,8 @@ jobs:
     name: Prime shared Gradle cache
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      GRADLE_USER_HOME: ${{ github.workspace }}/.cache/gradle
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
@@ -138,13 +153,14 @@ jobs:
 
       - name: Cache Gradle (lookup-only)
         id: cache-gradle-restore
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        uses: Ludy87/cache-the-planet@main
         with:
+          repository: Ludy87/cache-the-planet
           path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
+            .cache/gradle/caches
+            .cache/gradle/wrapper
           key: ${{ steps.gradle-cache-key.outputs.key }}
-          lookup-only: true
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
 
       - name: Set up JDK 25
         if: steps.cache-gradle-restore.outputs.cache-hit != 'true'
@@ -164,9 +180,15 @@ jobs:
 
       - name: Save cache Gradle User Home
         if: steps.cache-gradle-restore.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
         with:
+          repository: Ludy87/cache-the-planet
           path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
+            .cache/gradle/caches
+            .cache/gradle/wrapper
           key: ${{ steps.gradle-cache-key.outputs.key }}
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          exclude: |
+            **/.env
+            **/*.pem
+            **/*credentials*
