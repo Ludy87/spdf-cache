@@ -20,6 +20,16 @@ jobs:
           egress-policy: audit
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Restore npm cache
+        id: npm-cache
+        uses: Ludy87/cache-the-planet@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        with:
+          repository: Ludy87/cache-the-planet
+          path: ~/.npm
+          key: npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -123,8 +133,17 @@ jobs:
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: "0.12.6"
-          enable-cache: true
+          enable-cache: false
           download-from-astral-mirror: false
+
+      - name: Save npm cache
+        if: steps.frontend-check.outcome == 'success' && github.event_name != 'pull_request'
+        uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        with:
+          repository: Ludy87/cache-the-planet
+          path: ~/.npm
+          key: npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-${{ hashFiles('package-lock.json') }}
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
 
       - name: Vitest coverage step summary
         if: always()

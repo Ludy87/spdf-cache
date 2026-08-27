@@ -27,11 +27,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Restore uv cache
+        id: uv-cache
+        uses: Ludy87/cache-the-planet@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        with:
+          repository: Ludy87/cache-the-planet
+          path: |
+            ~/.cache/uv
+            engine/.venv
+          key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
+          restore-keys: |
+            uv-v1-${{ runner.os }}-${{ runner.arch }}-
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+
       - name: Install uv
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: "0.12.6"
-          enable-cache: true
+          enable-cache: false
           download-from-astral-mirror: false
 
       - name: Install Task
@@ -41,6 +54,21 @@ jobs:
         id: engine-check
         run: task engine:check
         continue-on-error: true
+
+      - name: Save uv cache
+        if: steps.engine-check.outcome == 'success' && github.event_name != 'pull_request'
+        uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        with:
+          repository: Ludy87/cache-the-planet
+          path: |
+            ~/.cache/uv
+            engine/.venv
+          key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          exclude: |
+            **/.env
+            **/*.pem
+            **/*credentials*
 
       - name: Comment on engine check failure
         # Only post a comment on PRs. github-script's PR helpers need an

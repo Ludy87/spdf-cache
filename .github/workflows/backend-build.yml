@@ -35,12 +35,17 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Restore cache Gradle User Home
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: gradle-cache
+        uses: Ludy87/cache-the-planet@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
         with:
+          repository: Ludy87/cache-the-planet
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: gradle-v1-${{ runner.os }}-${{ runner.arch }}-jdk-${{ matrix.jdk-version }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml', 'buildSrc/**', 'settings.gradle', 'build.gradle', 'app/**/build.gradle', 'gradle/**/*.gradle') }}
+          restore-keys: |
+            gradle-v1-${{ runner.os }}-${{ runner.arch }}-jdk-${{ matrix.jdk-version }}-
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
 
       - name: Set up JDK ${{ matrix.jdk-version }}
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
@@ -154,6 +159,21 @@ jobs:
           # configures the Gradle client JVM.
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -XX:+UseG1GC"
 
+      - name: Save cache Gradle User Home
+        if: success() && github.event_name != 'pull_request'
+        uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        with:
+          repository: Ludy87/cache-the-planet
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-v1-${{ runner.os }}-${{ runner.arch }}-jdk-${{ matrix.jdk-version }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml', 'buildSrc/**', 'settings.gradle', 'build.gradle', 'app/**/build.gradle', 'gradle/**/*.gradle') }}
+          token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          exclude: |
+            **/.env
+            **/*.pem
+            **/*credentials*
+
       - name: Check Test Reports Exist
         if: always()
         run: |
@@ -197,7 +217,7 @@ jobs:
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: "0.12.6"
-          enable-cache: true
+          enable-cache: false
           download-from-astral-mirror: false
 
       - name: JaCoCo coverage step summary
