@@ -54,8 +54,11 @@ jobs:
           node-version: "22"
           package-manager-cache: false
 
-      - name: Install dependencies
-        run: node --version && npm --version
+      - name: Install frontend dependencies
+        working-directory: frontend
+        env:
+          NPM_CONFIG_IGNORE_SCRIPTS: "true"
+        run: npm ci --ignore-scripts --audit=false --fund=false
 
       - name: Save node cache
         if: >-
