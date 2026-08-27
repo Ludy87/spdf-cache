@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
+      UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.cache/uv-python
     permissions:
       contents: read
       pull-requests: write
@@ -37,6 +38,7 @@ jobs:
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: |
             .cache/uv
+            .cache/uv-python
             engine/.venv
           key: >-
             ${{ github.event_name == 'pull_request'
@@ -86,6 +88,7 @@ jobs:
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: |
             .cache/uv
+            .cache/uv-python
             engine/.venv
           key: >-
             ${{ github.event_name == 'pull_request'
