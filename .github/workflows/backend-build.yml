@@ -38,7 +38,7 @@ jobs:
 
       - name: Restore cache Gradle User Home
         id: gradle-cache
-        uses: Ludy87/cache-the-planet@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
           path: |
