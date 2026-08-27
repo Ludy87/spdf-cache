@@ -44,6 +44,7 @@ jobs:
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
+          encryption-key: ${{ secrets.CACHE_ENCRYPTION_KEY }}
           path: .cache/uv
           key: >-
             ${{ github.event_name == 'pull_request'
@@ -85,6 +86,7 @@ jobs:
         uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
+          encryption-key: ${{ secrets.CACHE_ENCRYPTION_KEY }}
           path: .cache/uv
           key: >-
             ${{ github.event_name == 'pull_request'
@@ -129,6 +131,7 @@ jobs:
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
+          encryption-key: ${{ secrets.CACHE_ENCRYPTION_KEY }}
           path: .cache/buildx/unoserver
           key: >-
             ${{ github.event_name == 'pull_request'
@@ -203,6 +206,7 @@ jobs:
         uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
+          encryption-key: ${{ secrets.CACHE_ENCRYPTION_KEY }}
           path: .cache/buildx/unoserver
           key: >-
             ${{ github.event_name == 'pull_request'
@@ -254,6 +258,7 @@ jobs:
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
+          encryption-key: ${{ secrets.CACHE_ENCRYPTION_KEY }}
           path: |
             .cache/gradle/caches
             .cache/gradle/wrapper
@@ -315,6 +320,7 @@ jobs:
         uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
+          encryption-key: ${{ secrets.CACHE_ENCRYPTION_KEY }}
           path: |
             .cache/gradle/caches
             .cache/gradle/wrapper
