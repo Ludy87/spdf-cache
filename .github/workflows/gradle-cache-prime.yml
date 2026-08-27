@@ -202,7 +202,7 @@ jobs:
           MAVEN_PUBLIC_URL: ${{ secrets.MAVEN_PUBLIC_URL }}
 
       - name: Save cache Gradle User Home
-        if: steps.cache-gradle-restore.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
