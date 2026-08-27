@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Restore uv cache
-        id: cache
+        id: cache-uv-restore
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
@@ -52,12 +52,12 @@ jobs:
 
       - name: Report uv cache result
         run: |
-          echo "Exact hit: ${{ steps.cache.outputs.cache-hit }}"
-          echo "Matched key: ${{ steps.cache.outputs.matched-key }}"
-          echo "Object: ${{ steps.cache.outputs.content-hash }}"
+          echo "Exact hit: ${{ steps.cache-uv-restore.outputs.cache-hit }}"
+          echo "Matched key: ${{ steps.cache-uv-restore.outputs.matched-key }}"
+          echo "Object: ${{ steps.cache-uv-restore.outputs.content-hash }}"
 
       - name: Install uv
-        # if: steps.cache-uv-restore.outputs.cache-hit != 'true'
+        if: steps.cache-uv-restore.outputs.cache-hit != 'true'
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: "0.12.6"
@@ -116,7 +116,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Restore Buildx cache
-        id: cache
+        id: cache-buildx-restore
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
@@ -147,24 +147,25 @@ jobs:
 
       - name: Report Buildx cache result
         run: |
-          echo "Exact hit: ${{ steps.cache.outputs.cache-hit }}"
-          echo "Matched key: ${{ steps.cache.outputs.matched-key }}"
-          echo "Object: ${{ steps.cache.outputs.content-hash }}"
+          echo "Exact hit: ${{ steps.cache-buildx-restore.outputs.cache-hit }}"
+          echo "Matched key: ${{ steps.cache-buildx-restore.outputs.matched-key }}"
+          echo "Object: ${{ steps.cache-buildx-restore.outputs.content-hash }}"
 
       - name: Prepare Buildx cache directory
+        if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
         run: mkdir -p .cache/buildx/unoserver
 
       - name: Set up QEMU
-        # if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
+        if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
         uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
 
       - name: Set up Docker Buildx
-        # if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
+        if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
         id: buildx
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
       - name: Build docker/unoserver/Dockerfile
-        # if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
+        if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
@@ -182,14 +183,14 @@ jobs:
           sbom: false
 
       - name: Promote Buildx cache
-        if: success()
+        if: success() && steps.cache-buildx-restore.outputs.cache-hit != 'true'
         run: |
           rm -rf .cache/buildx/unoserver
           mv .cache/buildx/unoserver-new .cache/buildx/unoserver
 
       - name: Save Buildx cache
         if: >-
-          success() &&
+          success() && steps.cache-buildx-restore.outputs.cache-hit != 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
