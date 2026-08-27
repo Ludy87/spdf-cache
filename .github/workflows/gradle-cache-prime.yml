@@ -28,17 +28,6 @@ jobs:
       - name: Checkout repository 2
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Check cache token availability
-        env:
-          CACHE_APP_TOKEN: ${{ secrets.CACHE_APP_TOKEN }}
-        run: |
-          if [ -n "$CACHE_APP_TOKEN" ]; then
-            echo "CACHE_APP_TOKEN is available"
-          else
-            echo "CACHE_APP_TOKEN is missing"
-            exit 1
-          fi
-
       - name: Restore uv cache
         id: cache
         uses: Ludy87/cache-the-planet@main
