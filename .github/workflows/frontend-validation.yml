@@ -146,6 +146,7 @@ jobs:
           path: .cache/npm
           key: npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-${{ hashFiles('package-lock.json') }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          allow-pr-cache: true
 
       - name: Vitest coverage step summary
         if: always()

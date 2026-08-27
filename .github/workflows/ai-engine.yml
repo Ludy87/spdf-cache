@@ -67,6 +67,7 @@ jobs:
             engine/.venv
           key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+          allow-pr-cache: true
           exclude: |
             **/.env
             **/*.pem
