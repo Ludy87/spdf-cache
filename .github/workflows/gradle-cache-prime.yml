@@ -48,8 +48,8 @@ jobs:
         run: uv sync --project engine --locked --group tools
 
       - name: Save uv cache
-        if: success() && github.event_name != 'pull_request'
-        uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        if: success()
+        uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/uv
@@ -120,8 +120,8 @@ jobs:
           mv .cache/buildx/unoserver-new .cache/buildx/unoserver
 
       - name: Save Buildx cache
-        if: success() && github.event_name != 'pull_request'
-        uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        if: success()
+        uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/buildx/unoserver
@@ -180,7 +180,7 @@ jobs:
 
       - name: Save cache Gradle User Home
         if: steps.cache-gradle-restore.outputs.cache-hit != 'true'
-        uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
           path: |

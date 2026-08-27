@@ -162,8 +162,8 @@ jobs:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -XX:+UseG1GC"
 
       - name: Save cache Gradle User Home
-        if: success() && github.event_name != 'pull_request'
-        uses: Ludy87/cache-the-planet/save@2f43a022ce524c399482aaca52004547ceca52b8 # cache-the-planet main
+        if: success()
+        uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
           path: |
