@@ -29,12 +29,19 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Restore uv cache
+        id: cache
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/uv
           key: uv-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('engine/pyproject.toml', 'engine/uv.lock') }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+
+      - name: Report uv cache result
+        run: |
+          echo "Exact hit: ${{ steps.cache.outputs.cache-hit }}"
+          echo "Matched key: ${{ steps.cache.outputs.matched-key }}"
+          echo "Object: ${{ steps.cache.outputs.content-hash }}"
 
       - name: Install uv
         # if: steps.cache-uv-restore.outputs.cache-hit != 'true'
@@ -75,13 +82,19 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Restore Buildx cache
-        id: buildx-cache
+        id: cache
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/buildx/unoserver
           key: buildx-v1-${{ runner.os }}-${{ runner.arch }}-unoserver-${{ hashFiles('docker/unoserver/Dockerfile', 'docker/unoserver/fonts.conf', 'docker/unoserver/entrypoint.sh', 'docker/unoserver/healthcheck.sh', '.dockerignore') }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
+
+      - name: Report Buildx cache result
+        run: |
+          echo "Exact hit: ${{ steps.cache.outputs.cache-hit }}"
+          echo "Matched key: ${{ steps.cache.outputs.matched-key }}"
+          echo "Object: ${{ steps.cache.outputs.content-hash }}"
 
       - name: Prepare Buildx cache directory
         run: mkdir -p .cache/buildx/unoserver
@@ -152,7 +165,7 @@ jobs:
           echo "key=gradle-v1-${{ runner.os }}-${{ runner.arch }}-jdk-25-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml', 'buildSrc/**', 'settings.gradle', 'build.gradle', 'app/**/build.gradle', 'gradle/**/*.gradle') }}" >> "$GITHUB_OUTPUT"
 
       - name: Cache Gradle (lookup-only)
-        id: cache-gradle-restore
+        id: cache
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
@@ -162,15 +175,21 @@ jobs:
           key: ${{ steps.gradle-cache-key.outputs.key }}
           token: ${{ secrets.CACHE_APP_TOKEN || github.token }}
 
+      - name: Report Gradle cache result
+        run: |
+          echo "Exact hit: ${{ steps.cache.outputs.cache-hit }}"
+          echo "Matched key: ${{ steps.cache.outputs.matched-key }}"
+          echo "Object: ${{ steps.cache.outputs.content-hash }}"
+
       - name: Set up JDK 25
-        if: steps.cache-gradle-restore.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
         with:
           java-version: "25"
           distribution: "temurin"
 
       - name: Resolve backend dependencies
-        if: steps.cache-gradle-restore.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         run: ./gradlew :stirling-pdf:classes --no-daemon
         env:
           STIRLING_FLAVOR: saas
