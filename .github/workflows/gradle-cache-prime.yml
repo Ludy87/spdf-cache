@@ -91,7 +91,7 @@ jobs:
                   runner.arch,
                   hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
-          allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+          allow-pr-cache: true
           exclude: |
             **/.env
             **/*.pem
@@ -219,7 +219,7 @@ jobs:
                     'docker/unoserver/healthcheck.sh',
                     '.dockerignore')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
-          allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+          allow-pr-cache: true
           exclude: |
             **/.env
             **/*.pem
@@ -339,7 +339,7 @@ jobs:
                     'app/**/build.gradle',
                     'gradle/**/*.gradle')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
-          allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+          allow-pr-cache: true
           exclude: |
             **/.env
             **/*.pem
