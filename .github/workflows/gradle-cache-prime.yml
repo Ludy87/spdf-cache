@@ -32,7 +32,7 @@ jobs:
         id: cache-node-restore
         uses: Ludy87/cache-the-planet@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/npm
           cache-name: npm
@@ -72,7 +72,7 @@ jobs:
            github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
           path: .cache/npm
           cache-name: npm
           key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('frontend/package-lock.json')) }}
@@ -90,6 +90,9 @@ jobs:
     name: Prime uv cache
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
+      UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.cache/uv-python
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
@@ -103,7 +106,7 @@ jobs:
         id: cache-uv-restore
         uses: Ludy87/cache-the-planet@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: |
             .cache/uv
@@ -137,7 +140,7 @@ jobs:
            github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: |
             .cache/uv
@@ -157,6 +160,8 @@ jobs:
     name: Prime unoserver image cache
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      BUILDX_CACHE: ${{ github.workspace }}/.cache/buildx/unoserver
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
@@ -170,7 +175,7 @@ jobs:
         id: cache-buildx-restore
         uses: Ludy87/cache-the-planet@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/buildx/unoserver
           cache-name: buildx-unoserver
@@ -227,7 +232,7 @@ jobs:
            github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/buildx/unoserver
           cache-name: buildx-unoserver
@@ -245,6 +250,8 @@ jobs:
     name: Prime shared Gradle cache
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      GRADLE_USER_HOME: ${{ github.workspace }}/.cache/gradle
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
@@ -257,7 +264,7 @@ jobs:
         id: cache
         uses: Ludy87/cache-the-planet@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: |
             .cache/gradle/caches
@@ -295,13 +302,14 @@ jobs:
            github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: |
             .cache/gradle/caches
             .cache/gradle/wrapper
           cache-name: gradle
           key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml', 'buildSrc/**', 'settings.gradle', 'build.gradle', 'app/**/build.gradle', 'gradle/**/*.gradle')) }}
+          token: ${{ secrets.CACHE_APP_TOKEN }}
           exclude: |
             **/.env
             **/*.pem
