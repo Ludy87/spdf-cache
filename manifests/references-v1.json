@@ -5000,6 +5000,10 @@
     "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/37b7d4db671db9098b3428294eae2e00cdaccc04b19be90617fda952f095b85b/v1": {
       "object": "sha256:46ff473424cce0e1856467753f145b9d1b22f4e9d7c3d98912f05ad073135147",
       "updated_at": "2026-08-28T20:59:39.468Z"
+    },
+    "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/f1bebd8bb68aa066ed02fdb4d5a6e71737322182d4d2a4f0c8c9fcdc086a22cb/v1": {
+      "object": "sha256:b9f6e1de6f097260ae813e6f59c8d6432b1a98c241229a7ccad3f4d6404d6372",
+      "updated_at": "2026-08-28T20:59:55.798Z"
     }
   }
 }
