@@ -10,6 +10,79 @@ permissions:
   contents: write
 
 jobs:
+  node-cache-prime:
+    environment:
+      name: ci-unsigned
+      deployment: false
+    name: Prime node cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NPM_CONFIG_CACHE: ${{ github.workspace }}/.cache/npm
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout repository q
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Restore node cache
+        id: cache-node-restore
+        uses: Ludy87/cache-the-planet@main
+        with:
+          repository: Ludy87/spdf-cache
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
+          path: .cache/npm
+          cache-name: npm
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('frontend/package-lock.json')) }}
+          token: ${{ secrets.CACHE_APP_TOKEN }}
+
+      - name: Report node cache result
+        run: |
+          echo "Exact hit: ${{ steps.cache-node-restore.outputs.cache-hit }}"
+          echo "Matched key: ${{ steps.cache-node-restore.outputs.matched-key }}"
+          echo "Object: ${{ steps.cache-node-restore.outputs.content-hash }}"
+
+      - name: Set up Node.js
+        if: ${{ steps.cache-node-restore.outputs.cache-hit != 'true' }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+          package-manager-cache: false
+
+      - name: Prepare npm cache directory
+        if: ${{ steps.cache-node-restore.outputs.cache-hit != 'true' }}
+        run: |
+          echo "npm cache: $(npm config get cache)"
+          mkdir -p "$NPM_CONFIG_CACHE"
+
+      - name: Install frontend dependencies
+        if: ${{ steps.cache-node-restore.outputs.cache-hit != 'true' }}
+        working-directory: frontend
+        env:
+          NPM_CONFIG_IGNORE_SCRIPTS: "true"
+        run: npm ci --ignore-scripts --audit=false --fund=false
+
+      - name: Save node cache
+        if: >-
+          success() && steps.cache-node-restore.outputs.cache-hit != 'true' &&
+          (github.event_name != 'pull_request' ||
+           github.event.pull_request.head.repo.full_name == github.repository)
+        uses: Ludy87/cache-the-planet/save@main
+        with:
+          repository: Ludy87/spdf-cache
+          path: .cache/npm
+          cache-name: npm
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('frontend/package-lock.json')) }}
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
+          token: ${{ secrets.CACHE_APP_TOKEN }}
+          exclude: |
+            **/.env
+            **/*.pem
+            **/*credentials*
+
   uv-cache-prime:
     environment:
       name: ci-unsigned
@@ -19,55 +92,37 @@ jobs:
     timeout-minutes: 15
     env:
       UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
+      UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.cache/uv-python
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         with:
           egress-policy: audit
 
-      - name: Checkout repository
+      - name: Checkout repository 6
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Check cache token availability
-        env:
-          CACHE_APP_TOKEN: ${{ secrets.CACHE_APP_TOKEN }}
-        run: |
-          if [ -n "$CACHE_APP_TOKEN" ]; then
-            echo "CACHE_APP_TOKEN is available"
-          else
-            echo "CACHE_APP_TOKEN is missing"
-            exit 1
-          fi
-
       - name: Restore uv cache
-        id: cache
+        id: cache-uv-restore
         uses: Ludy87/cache-the-planet@main
         with:
-          repository: Ludy87/cache-the-planet
-          path: .cache/uv
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock'))
-                || format('trusted/{0}/uv/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
+          repository: Ludy87/spdf-cache
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
+          path: |
+            .cache/uv
+            .cache/uv-python
+          cache-name: uv
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Report uv cache result
         run: |
-          echo "Exact hit: ${{ steps.cache.outputs.cache-hit }}"
-          echo "Matched key: ${{ steps.cache.outputs.matched-key }}"
-          echo "Object: ${{ steps.cache.outputs.content-hash }}"
+          echo "Exact hit: ${{ steps.cache-uv-restore.outputs.cache-hit }}"
+          echo "Matched key: ${{ steps.cache-uv-restore.outputs.matched-key }}"
+          echo "Object: ${{ steps.cache-uv-restore.outputs.content-hash }}"
 
       - name: Install uv
-        # if: steps.cache-uv-restore.outputs.cache-hit != 'true'
+        if: steps.cache-uv-restore.outputs.cache-hit != 'true'
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: "0.12.6"
@@ -75,32 +130,24 @@ jobs:
           download-from-astral-mirror: false
 
       - name: Prime uv dependencies
+        if: steps.cache-uv-restore.outputs.cache-hit != 'true'
         run: uv sync --project engine --locked --group tools
 
       - name: Save uv cache
         if: >-
-          success() &&
+          success() && steps.cache-uv-restore.outputs.cache-hit != 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
         with:
-          repository: Ludy87/cache-the-planet
-          path: .cache/uv
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock'))
-                || format('trusted/{0}/uv/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
+          repository: Ludy87/spdf-cache
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
+          path: |
+            .cache/uv
+            .cache/uv-python
+          cache-name: uv
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
-          allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
           exclude: |
             **/.env
             **/*.pem
@@ -114,7 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      BUILDX_CACHE: .cache/buildx/unoserver
+      BUILDX_CACHE: ${{ github.workspace }}/.cache/buildx/unoserver
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
@@ -125,54 +172,37 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Restore Buildx cache
-        id: cache
+        id: cache-buildx-restore
         uses: Ludy87/cache-the-planet@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/buildx/unoserver
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/buildx/{2}-{3}/unoserver-{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('docker/unoserver/Dockerfile',
-                    'docker/unoserver/fonts.conf',
-                    'docker/unoserver/entrypoint.sh',
-                    'docker/unoserver/healthcheck.sh',
-                    '.dockerignore'))
-                || format('trusted/{0}/buildx/{1}-{2}/unoserver-{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('docker/unoserver/Dockerfile',
-                    'docker/unoserver/fonts.conf',
-                    'docker/unoserver/entrypoint.sh',
-                    'docker/unoserver/healthcheck.sh',
-                    '.dockerignore')) }}
+          cache-name: buildx-unoserver
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('docker/unoserver/Dockerfile', 'docker/unoserver/fonts.conf', 'docker/unoserver/entrypoint.sh', 'docker/unoserver/healthcheck.sh', '.dockerignore')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Report Buildx cache result
         run: |
-          echo "Exact hit: ${{ steps.cache.outputs.cache-hit }}"
-          echo "Matched key: ${{ steps.cache.outputs.matched-key }}"
-          echo "Object: ${{ steps.cache.outputs.content-hash }}"
+          echo "Exact hit: ${{ steps.cache-buildx-restore.outputs.cache-hit }}"
+          echo "Matched key: ${{ steps.cache-buildx-restore.outputs.matched-key }}"
+          echo "Object: ${{ steps.cache-buildx-restore.outputs.content-hash }}"
 
       - name: Prepare Buildx cache directory
+        if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
         run: mkdir -p .cache/buildx/unoserver
 
       - name: Set up QEMU
-        # if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
+        if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
         uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
 
       - name: Set up Docker Buildx
-        # if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
+        if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
         id: buildx
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
       - name: Build docker/unoserver/Dockerfile
-        # if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
+        if: steps.cache-buildx-restore.outputs.cache-hit != 'true'
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
@@ -190,43 +220,24 @@ jobs:
           sbom: false
 
       - name: Promote Buildx cache
-        if: success()
+        if: success() && steps.cache-buildx-restore.outputs.cache-hit != 'true'
         run: |
           rm -rf .cache/buildx/unoserver
           mv .cache/buildx/unoserver-new .cache/buildx/unoserver
 
       - name: Save Buildx cache
         if: >-
-          success() &&
+          success() && steps.cache-buildx-restore.outputs.cache-hit != 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/buildx/unoserver
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/buildx/{2}-{3}/unoserver-{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('docker/unoserver/Dockerfile',
-                    'docker/unoserver/fonts.conf',
-                    'docker/unoserver/entrypoint.sh',
-                    'docker/unoserver/healthcheck.sh',
-                    '.dockerignore'))
-                || format('trusted/{0}/buildx/{1}-{2}/unoserver-{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('docker/unoserver/Dockerfile',
-                    'docker/unoserver/fonts.conf',
-                    'docker/unoserver/entrypoint.sh',
-                    'docker/unoserver/healthcheck.sh',
-                    '.dockerignore')) }}
+          cache-name: buildx-unoserver
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('docker/unoserver/Dockerfile', 'docker/unoserver/fonts.conf', 'docker/unoserver/entrypoint.sh', 'docker/unoserver/healthcheck.sh', '.dockerignore')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
-          allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
           exclude: |
             **/.env
             **/*.pem
@@ -253,35 +264,13 @@ jobs:
         id: cache
         uses: Ludy87/cache-the-planet@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: |
             .cache/gradle/caches
             .cache/gradle/wrapper
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/gradle/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
-                    'gradle/libs.versions.toml',
-                    'buildSrc/**',
-                    'settings.gradle',
-                    'build.gradle',
-                    'app/**/build.gradle',
-                    'gradle/**/*.gradle'))
-                || format('trusted/{0}/gradle/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
-                    'gradle/libs.versions.toml',
-                    'buildSrc/**',
-                    'settings.gradle',
-                    'build.gradle',
-                    'app/**/build.gradle',
-                    'gradle/**/*.gradle')) }}
+          cache-name: gradle
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml', 'buildSrc/**', 'settings.gradle', 'build.gradle', 'app/**/build.gradle', 'gradle/**/*.gradle')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Report Gradle cache result
@@ -308,43 +297,19 @@ jobs:
 
       - name: Save cache Gradle User Home
         if: >-
-          success() &&
-          steps.cache.outputs.cache-hit != 'true' &&
+          success() && steps.cache.outputs.cache-hit != 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
         uses: Ludy87/cache-the-planet/save@main
         with:
-          repository: Ludy87/cache-the-planet
+          repository: Ludy87/spdf-cache
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: |
             .cache/gradle/caches
             .cache/gradle/wrapper
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/gradle/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
-                    'gradle/libs.versions.toml',
-                    'buildSrc/**',
-                    'settings.gradle',
-                    'build.gradle',
-                    'app/**/build.gradle',
-                    'gradle/**/*.gradle'))
-                || format('trusted/{0}/gradle/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
-                    'gradle/libs.versions.toml',
-                    'buildSrc/**',
-                    'settings.gradle',
-                    'build.gradle',
-                    'app/**/build.gradle',
-                    'gradle/**/*.gradle')) }}
+          cache-name: gradle
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml', 'buildSrc/**', 'settings.gradle', 'build.gradle', 'app/**/build.gradle', 'gradle/**/*.gradle')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
-          allow-pr-cache: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
           exclude: |
             **/.env
             **/*.pem

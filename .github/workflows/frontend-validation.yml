@@ -27,6 +27,7 @@ jobs:
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/npm
           key: npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-${{ hashFiles('package-lock.json') }}
           restore-keys: |
@@ -143,10 +144,15 @@ jobs:
         uses: Ludy87/cache-the-planet/save@main
         with:
           repository: Ludy87/cache-the-planet
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/npm
+          cache-name: npm
           key: npm-v1-${{ runner.os }}-${{ runner.arch }}-node-22-${{ hashFiles('package-lock.json') }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
-          allow-pr-cache: true
+          exclude: |
+            **/.env
+            **/*.pem
+            **/*credentials*
 
       - name: Vitest coverage step summary
         if: always()
