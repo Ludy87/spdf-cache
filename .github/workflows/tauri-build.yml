@@ -152,21 +152,10 @@ jobs:
         uses: Ludy87/cache-the-planet@main
         with:
           repository: Ludy87/cache-the-planet
-          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/npm
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/npm/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('package-lock.json'))
-                || format('trusted/{0}/npm/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('package-lock.json')) }}
+          cache-name: npm
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('frontend/package-lock.json')) }}
+          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Setup Node.js

@@ -35,20 +35,8 @@ jobs:
           repository: Ludy87/cache-the-planet
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/npm
-          key: >-
-            ${{ github.event_name == 'pull_request'
-              && format('untrusted/{0}/pr-{1}/npm/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('frontend/package-lock.json'))
-              || format('trusted/{0}/npm/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('frontend/package-lock.json'))
-            }}
+          cache-name: npm
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('frontend/package-lock.json')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Report node cache result
@@ -86,20 +74,8 @@ jobs:
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/npm
-          key: >-
-            ${{ github.event_name == 'pull_request'
-              && format('untrusted/{0}/pr-{1}/npm/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('frontend/package-lock.json'))
-              || format('trusted/{0}/npm/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('frontend/package-lock.json'))
-            }}
+          cache-name: npm
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('frontend/package-lock.json')) }}
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
           exclude: |
@@ -132,19 +108,8 @@ jobs:
           path: |
             .cache/uv
             .cache/uv-python
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock'))
-                || format('trusted/{0}/uv/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
+          cache-name: uv
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Report uv cache result
@@ -177,19 +142,8 @@ jobs:
           path: |
             .cache/uv
             .cache/uv-python
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock'))
-                || format('trusted/{0}/uv/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
+          cache-name: uv
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
           exclude: |
             **/.env
@@ -219,27 +173,8 @@ jobs:
           repository: Ludy87/cache-the-planet
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/buildx/unoserver
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/buildx/{2}-{3}/unoserver-{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('docker/unoserver/Dockerfile',
-                    'docker/unoserver/fonts.conf',
-                    'docker/unoserver/entrypoint.sh',
-                    'docker/unoserver/healthcheck.sh',
-                    '.dockerignore'))
-                || format('trusted/{0}/buildx/{1}-{2}/unoserver-{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('docker/unoserver/Dockerfile',
-                    'docker/unoserver/fonts.conf',
-                    'docker/unoserver/entrypoint.sh',
-                    'docker/unoserver/healthcheck.sh',
-                    '.dockerignore')) }}
+          cache-name: buildx-unoserver
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('docker/unoserver/Dockerfile', 'docker/unoserver/fonts.conf', 'docker/unoserver/entrypoint.sh', 'docker/unoserver/healthcheck.sh', '.dockerignore')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Report Buildx cache result
@@ -295,27 +230,8 @@ jobs:
           repository: Ludy87/cache-the-planet
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
           path: .cache/buildx/unoserver
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/buildx/{2}-{3}/unoserver-{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('docker/unoserver/Dockerfile',
-                    'docker/unoserver/fonts.conf',
-                    'docker/unoserver/entrypoint.sh',
-                    'docker/unoserver/healthcheck.sh',
-                    '.dockerignore'))
-                || format('trusted/{0}/buildx/{1}-{2}/unoserver-{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('docker/unoserver/Dockerfile',
-                    'docker/unoserver/fonts.conf',
-                    'docker/unoserver/entrypoint.sh',
-                    'docker/unoserver/healthcheck.sh',
-                    '.dockerignore')) }}
+          cache-name: buildx-unoserver
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('docker/unoserver/Dockerfile', 'docker/unoserver/fonts.conf', 'docker/unoserver/entrypoint.sh', 'docker/unoserver/healthcheck.sh', '.dockerignore')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
           exclude: |
             **/.env
@@ -346,31 +262,8 @@ jobs:
           path: |
             .cache/gradle/caches
             .cache/gradle/wrapper
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/gradle/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
-                    'gradle/libs.versions.toml',
-                    'buildSrc/**',
-                    'settings.gradle',
-                    'build.gradle',
-                    'app/**/build.gradle',
-                    'gradle/**/*.gradle'))
-                || format('trusted/{0}/gradle/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
-                    'gradle/libs.versions.toml',
-                    'buildSrc/**',
-                    'settings.gradle',
-                    'build.gradle',
-                    'app/**/build.gradle',
-                    'gradle/**/*.gradle')) }}
+          cache-name: gradle
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml', 'buildSrc/**', 'settings.gradle', 'build.gradle', 'app/**/build.gradle', 'gradle/**/*.gradle')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Report Gradle cache result
@@ -407,32 +300,8 @@ jobs:
           path: |
             .cache/gradle/caches
             .cache/gradle/wrapper
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/gradle/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
-                    'gradle/libs.versions.toml',
-                    'buildSrc/**',
-                    'settings.gradle',
-                    'build.gradle',
-                    'app/**/build.gradle',
-                    'gradle/**/*.gradle'))
-                || format('trusted/{0}/gradle/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('gradle/wrapper/gradle-wrapper.properties',
-                    'gradle/libs.versions.toml',
-                    'buildSrc/**',
-                    'settings.gradle',
-                    'build.gradle',
-                    'app/**/build.gradle',
-                    'gradle/**/*.gradle')) }}
-          token: ${{ secrets.CACHE_APP_TOKEN }}
+          cache-name: gradle
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml', 'buildSrc/**', 'settings.gradle', 'build.gradle', 'app/**/build.gradle', 'gradle/**/*.gradle')) }}
           exclude: |
             **/.env
             **/*.pem

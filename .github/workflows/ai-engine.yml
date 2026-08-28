@@ -39,30 +39,8 @@ jobs:
           path: |
             .cache/uv
             .cache/uv-python
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock'))
-                || format('trusted/{0}/uv/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
-          restore-keys: |
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch)
-                || format('trusted/{0}/uv/{1}-{2}/',
-                  github.repository,
-                  runner.os,
-                  runner.arch) }}
+          cache-name: uv
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Install uv
@@ -88,21 +66,9 @@ jobs:
           path: |
             .cache/uv
             .cache/uv-python
-          key: >-
-            ${{ github.event_name == 'pull_request'
-                && format('untrusted/{0}/pr-{1}/uv/{2}-{3}/{4}/v1',
-                  github.repository,
-                  github.event.pull_request.number,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock'))
-                || format('trusted/{0}/uv/{1}-{2}/{3}/v1',
-                  github.repository,
-                  runner.os,
-                  runner.arch,
-                  hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
+          cache-name: uv
+          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
           token: ${{ secrets.CACHE_APP_TOKEN }}
-          allow-pr-cache: true
           exclude: |
             **/.env
             **/*.pem
