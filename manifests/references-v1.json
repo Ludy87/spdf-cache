@@ -8,6 +8,10 @@
     "untrusted/Ludy87/spdf-cache/pr-6/npm/Linux-X64/dc1dc0f6dd1f5eae2237e112584daf68742dc569a831574f2109f831c0480285/v1": {
       "object": "sha256:d700849279604983e037219a207849de1e61ffeac72843a48750096d597885de",
       "updated_at": "2026-08-28T11:06:23.477Z"
+    },
+    "untrusted/Ludy87/spdf-cache/pr-6/buildx-unoserver/Linux-X64/29d77e8616958338e05f79029438754cbab0f86a4f01738c5422a170a44ce289/v1": {
+      "object": "sha256:e9c9773be613170660157a496a724c9960cfd5d3b8024ca59fc4e7504802b460",
+      "updated_at": "2026-08-28T11:07:36.914Z"
     }
   }
 }
