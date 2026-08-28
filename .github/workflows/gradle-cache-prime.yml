@@ -30,7 +30,7 @@ jobs:
 
       - name: Restore node cache
         id: cache-node-restore
-        uses: Ludy87/cache-the-planet@main
+        uses: Ludy87/cache-the-planet@v1
         with:
           repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
           success() && steps.cache-node-restore.outputs.cache-hit != 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
-        uses: Ludy87/cache-the-planet/save@main
+        uses: Ludy87/cache-the-planet/save@v1
         with:
           repository: Ludy87/spdf-cache
           path: .cache/npm
@@ -104,7 +104,7 @@ jobs:
 
       - name: Restore uv cache
         id: cache-uv-restore
-        uses: Ludy87/cache-the-planet@main
+        uses: Ludy87/cache-the-planet@v1
         with:
           repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
@@ -138,7 +138,7 @@ jobs:
           success() && steps.cache-uv-restore.outputs.cache-hit != 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
-        uses: Ludy87/cache-the-planet/save@main
+        uses: Ludy87/cache-the-planet/save@v1
         with:
           repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
@@ -173,7 +173,7 @@ jobs:
 
       - name: Restore Buildx cache
         id: cache-buildx-restore
-        uses: Ludy87/cache-the-planet@main
+        uses: Ludy87/cache-the-planet@v1
         with:
           repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
@@ -230,7 +230,7 @@ jobs:
           success() && steps.cache-buildx-restore.outputs.cache-hit != 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
-        uses: Ludy87/cache-the-planet/save@main
+        uses: Ludy87/cache-the-planet/save@v1
         with:
           repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
@@ -262,7 +262,7 @@ jobs:
 
       - name: Cache Gradle (lookup-only)
         id: cache
-        uses: Ludy87/cache-the-planet@main
+        uses: Ludy87/cache-the-planet@v1
         with:
           repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
@@ -300,7 +300,7 @@ jobs:
           success() && steps.cache.outputs.cache-hit != 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
-        uses: Ludy87/cache-the-planet/save@main
+        uses: Ludy87/cache-the-planet/save@v1
         with:
           repository: Ludy87/spdf-cache
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}

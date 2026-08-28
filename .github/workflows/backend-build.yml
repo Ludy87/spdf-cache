@@ -38,7 +38,7 @@ jobs:
 
       - name: Restore cache Gradle User Home
         id: gradle-cache
-        uses: Ludy87/cache-the-planet@main
+        uses: Ludy87/cache-the-planet@v1
         with:
           repository: Ludy87/cache-the-planet
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
@@ -164,7 +164,7 @@ jobs:
 
       - name: Save cache Gradle User Home
         if: success()
-        uses: Ludy87/cache-the-planet/save@main
+        uses: Ludy87/cache-the-planet/save@v1
         with:
           repository: Ludy87/cache-the-planet
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}

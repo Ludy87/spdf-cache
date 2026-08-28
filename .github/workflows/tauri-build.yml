@@ -149,7 +149,7 @@ jobs:
 
       - name: Restore node cache
         id: cache-node-restore
-        uses: Ludy87/cache-the-planet@main
+        uses: Ludy87/cache-the-planet@v1
         with:
           repository: Ludy87/cache-the-planet
           path: .cache/npm

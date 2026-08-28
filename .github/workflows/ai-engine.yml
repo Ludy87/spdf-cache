@@ -29,7 +29,7 @@ jobs:
 
       - name: Restore uv cache
         id: uv-cache
-        uses: Ludy87/cache-the-planet@main
+        uses: Ludy87/cache-the-planet@v1
         with:
           repository: Ludy87/cache-the-planet
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
@@ -56,7 +56,7 @@ jobs:
         continue-on-error: true
 
       - name: Save uv cache
-        uses: Ludy87/cache-the-planet/save@main
+        uses: Ludy87/cache-the-planet/save@v1
         with:
           repository: Ludy87/cache-the-planet
           encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
