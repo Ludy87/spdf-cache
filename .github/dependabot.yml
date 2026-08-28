@@ -55,6 +55,7 @@ updates:
     cooldown:
       default-days: 7
     rebase-strategy: "auto"
+    open-pull-requests-limit: 100
 
   - package-ecosystem: npm
     directories:
