@@ -4508,6 +4508,10 @@
     "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/2b8b0f5007a7ab8f32beec069ead57fef3cc583fadeead35899a78bde8799244/v1": {
       "object": "sha256:f402ecffe5de49eaf9d9b3ea978f9fcc8a6f6ac5a781f378141d5c49be841441",
       "updated_at": "2026-08-28T20:16:37.948Z"
+    },
+    "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/f637561ce5bd4d8cbb3468b331b45d62d5ac28b3a2ad75d24e1421244749fa03/v1": {
+      "object": "sha256:b7f98ff3c149432f4a0bc01fefcd5e4625a514fc0c90fd38cbfc35efa23cca5d",
+      "updated_at": "2026-08-28T20:16:39.665Z"
     }
   }
 }
