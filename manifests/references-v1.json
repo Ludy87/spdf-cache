@@ -1900,6 +1900,10 @@
     "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/223ce0d30e24bc33d004e1567a7341ecca72c5034952e819633da47fbcfb067f/v1": {
       "object": "sha256:3a6e354035e300622d91710ef6aa6540a8a788deb41509e77f90e3d6f84bd145",
       "updated_at": "2026-08-28T16:33:01.406Z"
+    },
+    "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/c5378a9fb7433380412aa57b9211d2ada3a53632647723620c4a2de875a03bc8/v1": {
+      "object": "sha256:38c365418a103d9f268ee4e34d130f9b0c5e23575bba8cb86188cec9d92e99e5",
+      "updated_at": "2026-08-28T16:33:02.577Z"
     }
   }
 }
