@@ -2020,6 +2020,10 @@
     "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/233e7fb85a3d04e0e4fe9aa7b3b6cb0587cd79afeccae621c34512510a8eb684/v1": {
       "object": "sha256:d669b984208bd5f786f7f57de663933ddb00ec8ef61b38b46d558d9e05f4d98f",
       "updated_at": "2026-08-28T16:42:58.497Z"
+    },
+    "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/d8016aa619967158b0fa663b210aad4785d8c49e9e3fed38d639104beebc9ed2/v1": {
+      "object": "sha256:b5ed39a5a231373bb99972afdc99331c074d237463a613d1d0fde8f78fff5a78",
+      "updated_at": "2026-08-28T16:43:00.315Z"
     }
   }
 }
