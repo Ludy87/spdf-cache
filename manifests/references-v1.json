@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "references": {
+    "untrusted/Ludy87/spdf-cache/pr-6/uv/Linux-X64/7c39dcf5c437c9cb9db16af688b173a19b83c709ed94c429f579e7fcabd0561b/v1": {
+      "object": "sha256:d24611b5a9d6a75d88d432ee4925bbb8354118cc89e2e2bb1780f80c4c83c2c5",
+      "updated_at": "2026-08-28T11:06:02.844Z"
+    }
+  }
+}
