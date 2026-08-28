@@ -15,9 +15,6 @@ permissions:
 jobs:
   engine:
     runs-on: ubuntu-latest
-    env:
-      UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
-      UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.cache/uv-python
     permissions:
       contents: read
       pull-requests: write
