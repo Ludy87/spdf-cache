@@ -2008,6 +2008,10 @@
     "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/7abce5176e0da8f76672b3d87c2f7aba13a92e42724e606bcda2cacaa179b105/v1": {
       "object": "sha256:6b0e94c676a34b40c58c90026849288284cff81d2fee3aea69796782937422cd",
       "updated_at": "2026-08-28T16:41:41.474Z"
+    },
+    "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/3459b7d2ad0f5d1e1d2a8e5342775d9a0a63f107f1b44ba3797ab612bb95426d/v1": {
+      "object": "sha256:00f5954e31f446c65224c97f5514c202c2fa47f2d5a2387862d9b3e17cfd9119",
+      "updated_at": "2026-08-28T16:42:01.752Z"
     }
   }
 }
