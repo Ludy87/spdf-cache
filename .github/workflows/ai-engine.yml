@@ -27,18 +27,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Restore uv cache
-        id: uv-cache
-        uses: Ludy87/cache-the-planet@v1
-        with:
-          repository: Ludy87/cache-the-planet
-          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
-          path: |
-            .cache/uv
-            .cache/uv-python
-          cache-name: uv
-          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
-          token: ${{ secrets.CACHE_APP_TOKEN }}
+      # - name: Restore uv cache
+      #   id: uv-cache
+      #   uses: Ludy87/cache-the-planet@v1
+      #   with:
+      #     repository: Ludy87/cache-the-planet
+      #     encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
+      #     path: |
+      #       .cache/uv
+      #       .cache/uv-python
+      #     cache-name: uv
+      #     key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
+      #     token: ${{ secrets.CACHE_APP_TOKEN }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
@@ -55,21 +55,21 @@ jobs:
         run: task engine:check
         continue-on-error: true
 
-      - name: Save uv cache
-        uses: Ludy87/cache-the-planet/save@v1
-        with:
-          repository: Ludy87/cache-the-planet
-          encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
-          path: |
-            .cache/uv
-            .cache/uv-python
-          cache-name: uv
-          key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
-          token: ${{ secrets.CACHE_APP_TOKEN }}
-          exclude: |
-            **/.env
-            **/*.pem
-            **/*credentials*
+      # - name: Save uv cache
+      #   uses: Ludy87/cache-the-planet/save@v1
+      #   with:
+      #     repository: Ludy87/cache-the-planet
+      #     encryption-key: ${{ secrets.CACHE_APP_TOKEN }}
+      #     path: |
+      #       .cache/uv
+      #       .cache/uv-python
+      #     cache-name: uv
+      #     key: ${{ format('{0}-{1}/{2}/v1', runner.os, runner.arch, hashFiles('engine/pyproject.toml', 'engine/uv.lock')) }}
+      #     token: ${{ secrets.CACHE_APP_TOKEN }}
+      #     exclude: |
+      #       **/.env
+      #       **/*.pem
+      #       **/*credentials*
 
       - name: Comment on engine check failure
         # Only post a comment on PRs. github-script's PR helpers need an
