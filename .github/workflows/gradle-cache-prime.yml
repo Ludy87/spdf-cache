@@ -26,7 +26,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout repository q
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # - name: Restore node cache
       #   id: cache-node-restore
@@ -100,7 +100,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout repository 6
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # - name: Restore uv cache
       #   id: cache-uv-restore
@@ -169,7 +169,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # - name: Restore Buildx cache
       #   id: cache-buildx-restore
@@ -258,7 +258,7 @@ jobs:
         with:
           egress-policy: audit
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # - name: Cache Gradle (lookup-only)
       #   id: cache
