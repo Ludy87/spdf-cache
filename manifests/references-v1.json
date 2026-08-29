@@ -9448,6 +9448,10 @@
     "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/ec966ad82831733484e5c38ad5113e598bba61188a6468f34f9aa6c40065c825/v1": {
       "object": "sha256:397694b5ca54194247d3d34c508c0bd8e93e0d12bf65631401c959776276c725",
       "updated_at": "2026-08-29T03:19:57.089Z"
+    },
+    "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/814fefc6764b2e9e449b7207d11c42e3f8bfe53a8c77aa7acb8993e22b7285c6/v1": {
+      "object": "sha256:29f1311f218463eafa4d6d20c769d9a2ffbcbe52b2f9f7c48a803d74cb052620",
+      "updated_at": "2026-08-29T03:20:24.050Z"
     }
   }
 }
