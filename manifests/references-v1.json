@@ -9800,6 +9800,10 @@
     "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/6f641eeace3762530c4cc28b10f625f0e8b47c7a38efae0a64ef83b478a1a3f1/v1": {
       "object": "sha256:1f98fa524cdda9524e2381627d30ef32f681ec50bdf2b9f11c0fff88479cdceb",
       "updated_at": "2026-08-29T03:51:02.638Z"
+    },
+    "trusted/Ludy87/spdf-cache/main/gradle/Linux-X64/75ec195a77c15f07b4851138bdd1312812f31bbd1d08c247cdefad06d7be5103/v1": {
+      "object": "sha256:7f2fbf7d02b8cd466f55dc47949b909719cddc1842972742c939aa28758cc619",
+      "updated_at": "2026-08-29T03:51:04.549Z"
     }
   }
 }
